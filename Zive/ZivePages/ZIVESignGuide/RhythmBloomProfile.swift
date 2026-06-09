@@ -1,5 +1,4 @@
 import SwiftUI
-import PhotosUI
 
 enum RhythmBloomProfileFocusField {
     case username
@@ -20,7 +19,7 @@ struct RhythmBloomProfile: View {
     ]
 
     @State private var rhythmBloomProfileAvatar = "http://huanniuchat.oss-accelerate.aliyuncs.com/Zive2026/ZIVEDefaultAva.png"
-    @State private var rhythmBloomProfileSelectedAvatarItem: PhotosPickerItem?
+    @State private var rhythmBloomProfileShowsAvatarPicker = false
     @State private var rhythmBloomProfileUsername = ""
     @State private var rhythmBloomProfileLocation = "Los Angeles"
     @State private var rhythmBloomProfileGender: RhythmBloomProfileGender = .female
@@ -75,19 +74,21 @@ struct RhythmBloomProfile: View {
         .onAppear {
             rhythmBloomProfilePrefillUsernameIfNeeded()
         }
-        .onChange(of: rhythmBloomProfileSelectedAvatarItem) { _ in
-            Task {
-                await rhythmBloomProfileLoadSelectedAvatar()
-            }
+        .sheet(isPresented: $rhythmBloomProfileShowsAvatarPicker) {
+            ZiveLegacyMediaPicker(
+                ziveLegacyMediaPickerKind: .image,
+                ziveLegacyMediaPickerOnImageData: { rhythmBloomProfileAvatarData in
+                    rhythmBloomProfileSaveSelectedAvatar(rhythmBloomProfileAvatarData)
+                },
+                ziveLegacyMediaPickerOnVideoUrl: nil
+            )
         }
     }
 
     private var rhythmBloomProfileAvatarSection: some View {
-        PhotosPicker(
-            selection: $rhythmBloomProfileSelectedAvatarItem,
-            matching: .images,
-            photoLibrary: .shared()
-        ) {
+        Button {
+            rhythmBloomProfileShowsAvatarPicker = true
+        } label: {
             ZStack(alignment: .bottomTrailing) {
                 ZiveSmartImage(ziveSmartImagePath: rhythmBloomProfileAvatar)
                     .frame(width: 80, height: 80)
@@ -295,44 +296,19 @@ struct RhythmBloomProfile: View {
         rhythmBloomProfileNavigator.weioZwivbePresentRoot(.pulseVistaHome)
     }
 
-    private func rhythmBloomProfileLoadSelectedAvatar() async {
-        guard let rhythmBloomProfileAvatarItem = rhythmBloomProfileSelectedAvatarItem else {
-            return
-        }
-
+    private func rhythmBloomProfileSaveSelectedAvatar(_ rhythmBloomProfileAvatarData: Data) {
         do {
-            guard let rhythmBloomProfileAvatarData = try await rhythmBloomProfileAvatarItem
-                .loadTransferable(type: Data.self) else {
-                await MainActor.run {
-                    rhythmBloomProfileFeedbackCenter.ziveGlobalFeedbackShowToast(
-                        text: "Failed to load image",
-                        status: .error
-                    )
-                    rhythmBloomProfileSelectedAvatarItem = nil
-                }
-                return
-            }
-
             let rhythmBloomProfileAvatarUrl = try rhythmBloomProfileSaveAvatarData(
                 rhythmBloomProfileAvatarData,
-                preferredExtension: rhythmBloomProfileAvatarItem
-                    .supportedContentTypes
-                    .first?
-                    .preferredFilenameExtension ?? "jpg"
+                preferredExtension: "jpg"
             )
 
-            await MainActor.run {
-                rhythmBloomProfileAvatar = rhythmBloomProfileAvatarUrl.path
-                rhythmBloomProfileSelectedAvatarItem = nil
-            }
+            rhythmBloomProfileAvatar = rhythmBloomProfileAvatarUrl.path
         } catch {
-            await MainActor.run {
-                rhythmBloomProfileFeedbackCenter.ziveGlobalFeedbackShowToast(
-                    text: "Failed to update avatar",
-                    status: .error
-                )
-                rhythmBloomProfileSelectedAvatarItem = nil
-            }
+            rhythmBloomProfileFeedbackCenter.ziveGlobalFeedbackShowToast(
+                text: "Failed to update avatar",
+                status: .error
+            )
         }
     }
 
@@ -364,11 +340,5 @@ struct RhythmBloomProfile: View {
         await MainActor.run {
             rhythmBloomProfileFeedbackCenter.ziveGlobalFeedbackHideLoading()
         }
-    }
-}
-
-#Preview {
-    NavigationStack {
-        RhythmBloomProfile()
     }
 }

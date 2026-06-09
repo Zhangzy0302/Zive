@@ -25,7 +25,7 @@ enum WeioZwivbeRouter: Hashable {
 
 final class WeioZwivbeNavigator: ObservableObject {
     @Published var weioZwivbeRootRoute: WeioZwivbeRouter
-    @Published var weioZwivbePath = NavigationPath()
+    @Published var weioZwivbePath: [WeioZwivbeRouter] = []
 
     init() {
         weioZwivbeRootRoute = WeioZwivbeNavigator.weioZwivbeResolveInitialRoute()
@@ -36,12 +36,12 @@ final class WeioZwivbeNavigator: ObservableObject {
     }
 
     func weioZwivbePresentRoot(_ route: WeioZwivbeRouter) {
-        weioZwivbePath = NavigationPath()
+        weioZwivbePath = []
         weioZwivbeRootRoute = route
     }
 
     func weioZwivbeReplaceStack(with route: WeioZwivbeRouter) {
-        weioZwivbePath = NavigationPath()
+        weioZwivbePath = []
         weioZwivbePath.append(route)
     }
 
@@ -51,7 +51,7 @@ final class WeioZwivbeNavigator: ObservableObject {
     }
 
     func weioZwivbePopToRoot() {
-        weioZwivbePath = NavigationPath()
+        weioZwivbePath = []
     }
 
     private static func weioZwivbeResolveInitialRoute() -> WeioZwivbeRouter {
@@ -74,7 +74,7 @@ final class WeioZwivbeNavigator: ObservableObject {
 
 struct WeioZwivbeRoute: View {
     @StateObject private var weioZwivbeNavigator = WeioZwivbeNavigator()
-    @StateObject private var ziveGlobalFeedbackCenter = ZiveGlobalFeedbackCenter()
+    @StateObject private var ziveGlobalFeedbackCenter = ZiveGlobalFeedbackCenter.shared
     @StateObject private var cbnxweZGoLogCenter = CBnxweZGoLogCenter()
     @StateObject private var traceGlowActionSheetCenter = TraceGlowActionSheetCenter()
     @StateObject private var cacoaPulseWalletIAPManager = CacoaPulseWalletIAPManager()
@@ -89,11 +89,20 @@ struct WeioZwivbeRoute: View {
     var body: some View {
         ZStack {
             ZiveGlobalFeedbackHost {
-                NavigationStack(path: $weioZwivbeNavigator.weioZwivbePath) {
-                    weioZwivbeView(for: weioZwivbeNavigator.weioZwivbeRootRoute)
-                        .navigationDestination(for: WeioZwivbeRouter.self) { route in
-                            weioZwivbeView(for: route)
-                        }
+                if #available(iOS 16.0, *) {
+                    NavigationStack(path: $weioZwivbeNavigator.weioZwivbePath) {
+                        weioZwivbeView(for: weioZwivbeNavigator.weioZwivbeRootRoute)
+                            .navigationDestination(for: WeioZwivbeRouter.self) { route in
+                                weioZwivbeView(for: route)
+                            }
+                    }
+                } else {
+                    WeioZwivbeLegacyNavigationHost(
+                        weioZwivbeRootRoute: $weioZwivbeNavigator.weioZwivbeRootRoute,
+                        weioZwivbePath: $weioZwivbeNavigator.weioZwivbePath
+                    ) { weioZwivbeRoute in
+                        weioZwivbeView(for: weioZwivbeRoute)
+                    }
                 }
             }
 
@@ -180,5 +189,74 @@ struct WeioZwivbeRoute: View {
         case .cocoaPulseWallet:
             CocoaPulseWallet()
         }
+    }
+}
+
+private struct WeioZwivbeLegacyNavigationHost<WeioZwivbeDestination: View>: View {
+    @Binding var weioZwivbeRootRoute: WeioZwivbeRouter
+    @Binding var weioZwivbePath: [WeioZwivbeRouter]
+    let weioZwivbeDestination: (WeioZwivbeRouter) -> WeioZwivbeDestination
+
+    var body: some View {
+        NavigationView {
+            WeioZwivbeLegacyNavigationNode(
+                weioZwivbeRoute: weioZwivbeRootRoute,
+                weioZwivbeDepth: 0,
+                weioZwivbePath: $weioZwivbePath,
+                weioZwivbeDestination: weioZwivbeDestination
+            )
+        }
+        .navigationViewStyle(.stack)
+    }
+}
+
+private struct WeioZwivbeLegacyNavigationNode<WeioZwivbeDestination: View>: View {
+    let weioZwivbeRoute: WeioZwivbeRouter
+    let weioZwivbeDepth: Int
+    @Binding var weioZwivbePath: [WeioZwivbeRouter]
+    let weioZwivbeDestination: (WeioZwivbeRouter) -> WeioZwivbeDestination
+
+    private var weioZwivbeNextRoute: WeioZwivbeRouter? {
+        guard weioZwivbePath.indices.contains(weioZwivbeDepth) else {
+            return nil
+        }
+
+        return weioZwivbePath[weioZwivbeDepth]
+    }
+
+    private var weioZwivbeIsActive: Binding<Bool> {
+        Binding {
+            weioZwivbePath.count > weioZwivbeDepth
+        } set: { weioZwivbeIsActive in
+            guard !weioZwivbeIsActive,
+                  weioZwivbePath.count > weioZwivbeDepth else {
+                return
+            }
+
+            weioZwivbePath.removeSubrange(weioZwivbeDepth..<weioZwivbePath.count)
+        }
+    }
+
+    var body: some View {
+        ZStack {
+            weioZwivbeDestination(weioZwivbeRoute)
+
+            NavigationLink(isActive: weioZwivbeIsActive) {
+                if let weioZwivbeNextRoute {
+                    WeioZwivbeLegacyNavigationNode(
+                        weioZwivbeRoute: weioZwivbeNextRoute,
+                        weioZwivbeDepth: weioZwivbeDepth + 1,
+                        weioZwivbePath: $weioZwivbePath,
+                        weioZwivbeDestination: weioZwivbeDestination
+                    )
+                } else {
+                    EmptyView()
+                }
+            } label: {
+                EmptyView()
+            }
+            .hidden()
+        }
+        .navigationBarHidden(true)
     }
 }

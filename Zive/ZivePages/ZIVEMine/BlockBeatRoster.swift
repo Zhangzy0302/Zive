@@ -112,9 +112,3 @@ struct BlockBeatRoster: View {
         }
     }
 }
-
-#Preview {
-    NavigationStack {
-        BlockBeatRoster()
-    }
-}

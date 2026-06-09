@@ -6,6 +6,15 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		DD3D28AA2FD2B83800B6E6FF /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = DD3D28A92FD2B83800B6E6FF /* Alamofire */; };
+		DD3D28AD2FD2B87200B6E6FF /* AdjustSdk in Frameworks */ = {isa = PBXBuildFile; productRef = DD3D28AC2FD2B87200B6E6FF /* AdjustSdk */; };
+		DD3D28B02FD2B8AC00B6E6FF /* FacebookAEM in Frameworks */ = {isa = PBXBuildFile; productRef = DD3D28AF2FD2B8AC00B6E6FF /* FacebookAEM */; };
+		DD3D28B22FD2B8AC00B6E6FF /* FacebookBasics in Frameworks */ = {isa = PBXBuildFile; productRef = DD3D28B12FD2B8AC00B6E6FF /* FacebookBasics */; };
+		DD3D28B42FD2B8AC00B6E6FF /* FacebookCore in Frameworks */ = {isa = PBXBuildFile; productRef = DD3D28B32FD2B8AC00B6E6FF /* FacebookCore */; };
+		DD3D28B72FD2B92000B6E6FF /* ScreenShield in Frameworks */ = {isa = PBXBuildFile; productRef = DD3D28B62FD2B92000B6E6FF /* ScreenShield */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		DD5074EE2F98B343003CAA2F /* Zive.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Zive.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -36,6 +45,12 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DD3D28B02FD2B8AC00B6E6FF /* FacebookAEM in Frameworks */,
+				DD3D28B42FD2B8AC00B6E6FF /* FacebookCore in Frameworks */,
+				DD3D28B22FD2B8AC00B6E6FF /* FacebookBasics in Frameworks */,
+				DD3D28AD2FD2B87200B6E6FF /* AdjustSdk in Frameworks */,
+				DD3D28AA2FD2B83800B6E6FF /* Alamofire in Frameworks */,
+				DD3D28B72FD2B92000B6E6FF /* ScreenShield in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -78,6 +93,12 @@
 			);
 			name = Zive;
 			packageProductDependencies = (
+				DD3D28A92FD2B83800B6E6FF /* Alamofire */,
+				DD3D28AC2FD2B87200B6E6FF /* AdjustSdk */,
+				DD3D28AF2FD2B8AC00B6E6FF /* FacebookAEM */,
+				DD3D28B12FD2B8AC00B6E6FF /* FacebookBasics */,
+				DD3D28B32FD2B8AC00B6E6FF /* FacebookCore */,
+				DD3D28B62FD2B92000B6E6FF /* ScreenShield */,
 			);
 			productName = Zive;
 			productReference = DD5074EE2F98B343003CAA2F /* Zive.app */;
@@ -107,6 +128,12 @@
 			);
 			mainGroup = DD5074E52F98B343003CAA2F;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				DD3D28A82FD2B83800B6E6FF /* XCRemoteSwiftPackageReference "Alamofire" */,
+				DD3D28AB2FD2B87200B6E6FF /* XCRemoteSwiftPackageReference "ios_sdk" */,
+				DD3D28AE2FD2B8AC00B6E6FF /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */,
+				DD3D28B52FD2B92000B6E6FF /* XCRemoteSwiftPackageReference "ScreenShield" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DD5074EF2F98B343003CAA2F /* Products */;
 			projectDirPath = "";
@@ -190,7 +217,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -247,7 +274,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -262,8 +289,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Zive/Zive.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -277,12 +305,12 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zivenaawicnpgk.Zive;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -302,8 +330,9 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Zive/Zive.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = "";
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -317,12 +346,12 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				IPHONEOS_DEPLOYMENT_TARGET = 16.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.0;
+				MARKETING_VERSION = 1.1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zivenaawicnpgk.Zive;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -359,6 +388,74 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		DD3D28A82FD2B83800B6E6FF /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.12.0;
+			};
+		};
+		DD3D28AB2FD2B87200B6E6FF /* XCRemoteSwiftPackageReference "ios_sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/adjust/ios_sdk.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
+		DD3D28AE2FD2B8AC00B6E6FF /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/facebook/facebook-ios-sdk.git";
+			requirement = {
+				branch = main;
+				kind = branch;
+			};
+		};
+		DD3D28B52FD2B92000B6E6FF /* XCRemoteSwiftPackageReference "ScreenShield" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/JayantBadlani/ScreenShield.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.2.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		DD3D28A92FD2B83800B6E6FF /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD3D28A82FD2B83800B6E6FF /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+		DD3D28AC2FD2B87200B6E6FF /* AdjustSdk */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD3D28AB2FD2B87200B6E6FF /* XCRemoteSwiftPackageReference "ios_sdk" */;
+			productName = AdjustSdk;
+		};
+		DD3D28AF2FD2B8AC00B6E6FF /* FacebookAEM */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD3D28AE2FD2B8AC00B6E6FF /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookAEM;
+		};
+		DD3D28B12FD2B8AC00B6E6FF /* FacebookBasics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD3D28AE2FD2B8AC00B6E6FF /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookBasics;
+		};
+		DD3D28B32FD2B8AC00B6E6FF /* FacebookCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD3D28AE2FD2B8AC00B6E6FF /* XCRemoteSwiftPackageReference "facebook-ios-sdk" */;
+			productName = FacebookCore;
+		};
+		DD3D28B62FD2B92000B6E6FF /* ScreenShield */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DD3D28B52FD2B92000B6E6FF /* XCRemoteSwiftPackageReference "ScreenShield" */;
+			productName = ScreenShield;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = DD5074E62F98B343003CAA2F /* Project object */;
 }

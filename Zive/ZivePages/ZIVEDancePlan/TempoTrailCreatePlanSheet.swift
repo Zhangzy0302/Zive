@@ -187,7 +187,3 @@ struct TempoTrailCreatePlanSheet: View {
         tempoTrailCreatePlanSheetIsPresented = false
     }
 }
-
-#Preview {
-    TempoTrailCreatePlanSheet(tempoTrailCreatePlanSheetIsPresented: .constant(true))
-}

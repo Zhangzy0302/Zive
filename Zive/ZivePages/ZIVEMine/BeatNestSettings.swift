@@ -235,9 +235,3 @@ struct BeatNestSettings: View {
         try? FileManager.default.removeItem(at: beatNestSettingsUrl)
     }
 }
-
-#Preview {
-    NavigationStack {
-        BeatNestSettings()
-    }
-}

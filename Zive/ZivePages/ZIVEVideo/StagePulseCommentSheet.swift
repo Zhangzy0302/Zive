@@ -149,7 +149,7 @@ struct StagePulseCommentSheet: View {
                         .frame(width: 295, height: 208)
                 }
             )
-            .clipShape(UnevenRoundedRectangle(topLeadingRadius: 20, topTrailingRadius: 20))
+            .clipShape(ZiveTopRoundedCornerShape(ziveTopRoundedCornerRadius: 20))
             .padding(.bottom, stagePulseCommentSheetKeyboardHeight)
             .contentShape(Rectangle())
             .onTapGesture {
@@ -265,11 +265,4 @@ struct StagePulseCommentSheet: View {
             targetUserId: stagePulseCommentSheetTargetUserId
         )
     }
-}
-
-#Preview {
-    StagePulseCommentSheet(
-        stagePulseCommentSheetVideoId: "video_001",
-        stagePulseCommentSheetIsPresented: .constant(true)
-    )
 }

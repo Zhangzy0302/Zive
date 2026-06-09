@@ -116,9 +116,3 @@ struct TraceGlowReportDetail: View {
         traceGlowReportDetailNavigator.weioZwivbePop()
     }
 }
-
-#Preview {
-    NavigationStack {
-        TraceGlowReportDetail()
-    }
-}

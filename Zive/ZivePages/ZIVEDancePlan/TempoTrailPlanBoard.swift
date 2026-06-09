@@ -374,9 +374,3 @@ struct TempoTrailPlanBoard: View {
         )
     }
 }
-
-#Preview {
-    NavigationStack {
-        TempoTrailPlanBoard()
-    }
-}

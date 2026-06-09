@@ -41,6 +41,8 @@ struct ZiveToastPayload: Identifiable, Equatable {
 }
 
 final class ZiveGlobalFeedbackCenter: ObservableObject {
+    static let shared = ZiveGlobalFeedbackCenter()
+
     @Published var ziveGlobalFeedbackLoading: ZiveLoadingPayload?
     @Published var ziveGlobalFeedbackToast: ZiveToastPayload?
 

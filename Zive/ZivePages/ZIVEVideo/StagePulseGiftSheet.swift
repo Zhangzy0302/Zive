@@ -105,7 +105,7 @@ struct StagePulseGiftSheet: View {
                         .frame(width: 295, height: 208)
                 }
             )
-            .clipShape(UnevenRoundedRectangle(topLeadingRadius: 20, topTrailingRadius: 20))
+            .clipShape(ZiveTopRoundedCornerShape(ziveTopRoundedCornerRadius: 20))
             
             .transition(.move(edge: .bottom).combined(with: .opacity))
         }.ignoresSafeArea(edges: .bottom)
@@ -176,13 +176,4 @@ struct StagePulseGiftSheet: View {
             )
         ]
     }
-}
-
-#Preview {
-    StagePulseGiftSheet(
-        stagePulseGiftSheetVideoId: "video_001",
-        stagePulseGiftSheetRecipientUserId: "user_001",
-        stagePulseGiftSheetIsPresented: .constant(true),
-        stagePulseGiftSheetOnGive: { _ in }
-    )
 }

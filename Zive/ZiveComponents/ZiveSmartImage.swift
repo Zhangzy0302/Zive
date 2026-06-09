@@ -89,17 +89,3 @@ struct ZiveSmartImage<Placeholder: View>: View {
         return .assetName(ziveSmartImageTrimmedPath)
     }
 }
-
-#Preview {
-    VStack(spacing: 16) {
-        ZiveSmartImage(ziveSmartImagePath: "ZIVELogo")
-            .frame(width: 80, height: 80)
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-
-        ZiveSmartImage(ziveSmartImagePath: "https://example.com/image.png")
-            .frame(width: 120, height: 80)
-            .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-    }
-    .padding()
-    .background(Color.black)
-}

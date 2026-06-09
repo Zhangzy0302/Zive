@@ -62,6 +62,7 @@ struct ZiveGlobalFeedbackHost<Content: View>: View {
             .padding(.vertical, 22)
             .background(Color.black.opacity(0.78))
             .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .shadow(color: .white.opacity(0.5), radius: 8)
         }
     }
 

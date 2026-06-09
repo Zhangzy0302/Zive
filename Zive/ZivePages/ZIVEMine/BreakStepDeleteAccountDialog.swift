@@ -61,9 +61,3 @@ struct BreakStepDeleteAccountDialog: View {
         .transition(.opacity)
     }
 }
-
-#Preview {
-    BreakStepDeleteAccountDialog(
-        breakStepDeleteAccountIsPresented: .constant(true)
-    )
-}

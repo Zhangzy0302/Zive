@@ -1,5 +1,4 @@
 import SwiftUI
-import PhotosUI
 
 enum StepGlowEditProfileFocusField {
     case username
@@ -8,7 +7,7 @@ enum StepGlowEditProfileFocusField {
 struct StepGlowEditProfile: View {
     @State private var stepGlowEditProfileUsername = ""
     @State private var stepGlowEditProfileAvatar = ""
-    @State private var stepGlowEditProfileSelectedAvatarItem: PhotosPickerItem?
+    @State private var stepGlowEditProfileShowsAvatarPicker = false
     @FocusState private var stepGlowEditProfileFocusField: StepGlowEditProfileFocusField?
     @EnvironmentObject private var stepGlowEditProfileUserStore: OrbitUserStore
     @EnvironmentObject private var stepGlowEditProfileNavigator: WeioZwivbeNavigator
@@ -55,10 +54,14 @@ struct StepGlowEditProfile: View {
         .onAppear {
             stepGlowEditProfileLoadCurrentUser()
         }
-        .onChange(of: stepGlowEditProfileSelectedAvatarItem) { _ in
-            Task {
-                await stepGlowEditProfileLoadSelectedAvatar()
-            }
+        .sheet(isPresented: $stepGlowEditProfileShowsAvatarPicker) {
+            ZiveLegacyMediaPicker(
+                ziveLegacyMediaPickerKind: .image,
+                ziveLegacyMediaPickerOnImageData: { stepGlowEditProfileAvatarData in
+                    stepGlowEditProfileHandleSelectedAvatarData(stepGlowEditProfileAvatarData)
+                },
+                ziveLegacyMediaPickerOnVideoUrl: nil
+            )
         }
         .animation(.easeInOut(duration: 0.2), value: stepGlowEditProfileFocusField == nil)
         .navigationBarHidden(true)
@@ -71,11 +74,9 @@ struct StepGlowEditProfile: View {
     }
 
     private var stepGlowEditProfileAvatarSection: some View {
-        PhotosPicker(
-            selection: $stepGlowEditProfileSelectedAvatarItem,
-            matching: .images,
-            photoLibrary: .shared()
-        ) {
+        Button {
+            stepGlowEditProfileShowsAvatarPicker = true
+        } label: {
             ZStack(alignment: .bottomTrailing) {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .fill(Color.white)
@@ -168,44 +169,19 @@ struct StepGlowEditProfile: View {
         stepGlowEditProfileNavigator.weioZwivbePop()
     }
 
-    private func stepGlowEditProfileLoadSelectedAvatar() async {
-        guard let stepGlowEditProfileAvatarItem = stepGlowEditProfileSelectedAvatarItem else {
-            return
-        }
-
+    private func stepGlowEditProfileHandleSelectedAvatarData(_ stepGlowEditProfileAvatarData: Data) {
         do {
-            guard let stepGlowEditProfileAvatarData = try await stepGlowEditProfileAvatarItem
-                .loadTransferable(type: Data.self) else {
-                await MainActor.run {
-                    stepGlowEditProfileFeedbackCenter.ziveGlobalFeedbackShowToast(
-                        text: "Failed to load image",
-                        status: .error
-                    )
-                    stepGlowEditProfileSelectedAvatarItem = nil
-                }
-                return
-            }
-
             let stepGlowEditProfileAvatarUrl = try stepGlowEditProfileSaveAvatarData(
                 stepGlowEditProfileAvatarData,
-                preferredExtension: stepGlowEditProfileAvatarItem
-                    .supportedContentTypes
-                    .first?
-                    .preferredFilenameExtension ?? "jpg"
+                preferredExtension: "jpg"
             )
 
-            await MainActor.run {
-                stepGlowEditProfileAvatar = stepGlowEditProfileAvatarUrl.path
-                stepGlowEditProfileSelectedAvatarItem = nil
-            }
+            stepGlowEditProfileAvatar = stepGlowEditProfileAvatarUrl.path
         } catch {
-            await MainActor.run {
-                stepGlowEditProfileFeedbackCenter.ziveGlobalFeedbackShowToast(
-                    text: "Failed to update avatar",
-                    status: .error
-                )
-                stepGlowEditProfileSelectedAvatarItem = nil
-            }
+            stepGlowEditProfileFeedbackCenter.ziveGlobalFeedbackShowToast(
+                text: "Failed to update avatar",
+                status: .error
+            )
         }
     }
 
@@ -223,11 +199,5 @@ struct StepGlowEditProfile: View {
 
     private func stepGlowEditProfileDocumentsDirectory() -> URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    }
-}
-
-#Preview {
-    NavigationStack {
-        StepGlowEditProfile()
     }
 }

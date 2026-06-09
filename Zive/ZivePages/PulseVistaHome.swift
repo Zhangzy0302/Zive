@@ -106,7 +106,6 @@ struct PulseVistaHome: View {
             Text("Trending")
                 .font(ZiveStyle.FontBook.boldItalic(20))
                 .foregroundStyle(ZiveStyle.ColorPalette.textPink)
-                .italic()
 
             Text("Take a look at what's popular now")
                 .font(ZiveStyle.FontBook.regular(15))

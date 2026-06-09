@@ -125,7 +125,7 @@ struct PulseLedgerEULASheet: View {
                             .frame(width: 295)
                     }
                 )
-                .clipShape(UnevenRoundedRectangle(topLeadingRadius: 20, topTrailingRadius: 20))
+                .clipShape(ZiveTopRoundedCornerShape(ziveTopRoundedCornerRadius: 20))
                 .ignoresSafeArea(edges: .bottom)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
             }
@@ -151,10 +151,4 @@ struct PulseLedgerEULASheet: View {
     private var pulseLedgerEULAAgreeText: String {
         "b33770f0b414883c6807f78c72495ee1".grooveCipherAESDecrypt()
     }
-}
-
-#Preview {
-    PulseLedgerEULASheet(
-        pulseLedgerEULAIsPresented: .constant(true),
-    )
 }

@@ -294,9 +294,3 @@ struct EchoPulseProfile: View {
         }
     }
 }
-
-#Preview {
-    NavigationStack {
-        EchoPulseProfile(echoPulseProfileUserId: "user_001")
-    }
-}

@@ -124,9 +124,3 @@ struct ChatPulseRecently: View {
         return chatPulseRecentlyFormatter.string(from: chatPulseRecentlyDate)
     }
 }
-
-#Preview {
-    NavigationStack {
-        ChatPulseRecently()
-    }
-}

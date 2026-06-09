@@ -1,5 +1,4 @@
 import SwiftUI
-import PhotosUI
 import AVFoundation
 import UniformTypeIdentifiers
 import UIKit
@@ -10,7 +9,7 @@ enum FrameFlowUploadPostFocusField {
 
 struct FrameFlowUploadPost: View {
     @State private var frameFlowUploadPostContent = ""
-    @State private var frameFlowUploadPostSelectedVideoItem: PhotosPickerItem?
+    @State private var frameFlowUploadPostShowsVideoPicker = false
     @State private var frameFlowUploadPostVideoLocalUrlString = ""
     @State private var frameFlowUploadPostCoverLocalUrlString = ""
     @State private var frameFlowUploadPostIsUploading = false
@@ -58,10 +57,16 @@ struct FrameFlowUploadPost: View {
         .onTapGesture {
             frameFlowUploadPostFocusField = nil
         }
-        .onChange(of: frameFlowUploadPostSelectedVideoItem) { _ in
-            Task {
-                await frameFlowUploadPostLoadSelectedVideo()
-            }
+        .sheet(isPresented: $frameFlowUploadPostShowsVideoPicker) {
+            ZiveLegacyMediaPicker(
+                ziveLegacyMediaPickerKind: .video,
+                ziveLegacyMediaPickerOnImageData: nil,
+                ziveLegacyMediaPickerOnVideoUrl: { frameFlowUploadPostVideoUrl in
+                    Task {
+                        await frameFlowUploadPostLoadSelectedVideo(from: frameFlowUploadPostVideoUrl)
+                    }
+                }
+            )
         }
         .animation(.easeInOut(duration: 0.2), value: frameFlowUploadPostFocusField == nil)
         .navigationBarHidden(true)
@@ -73,11 +78,9 @@ struct FrameFlowUploadPost: View {
                 .font(ZiveStyle.FontBook.boldItalic(20))
                 .foregroundStyle(ZiveStyle.ColorPalette.white)
 
-            PhotosPicker(
-                selection: $frameFlowUploadPostSelectedVideoItem,
-                matching: .videos,
-                photoLibrary: .shared()
-            ) {
+            Button {
+                frameFlowUploadPostShowsVideoPicker = true
+            } label: {
                 RoundedRectangle(cornerRadius: 26, style: .continuous)
                     .fill(
                         .white.opacity(0.23)
@@ -145,7 +148,7 @@ struct FrameFlowUploadPost: View {
                 }
 
                 TextEditor(text: $frameFlowUploadPostContent)
-                    .scrollContentBackground(.hidden)
+                    .ziveHideTextEditorBackground()
                     .font(ZiveStyle.FontBook.regular(16))
                     .foregroundStyle(ZiveInputVariant.translucent.textColor)
                     .tint(ZiveInputVariant.translucent.cursorColor)
@@ -235,31 +238,18 @@ struct FrameFlowUploadPost: View {
         }
     }
 
-    private func frameFlowUploadPostLoadSelectedVideo() async {
-        guard let frameFlowUploadPostSelectedVideoItem else {
-            return
-        }
-
+    private func frameFlowUploadPostLoadSelectedVideo(from frameFlowUploadPostSelectedVideoUrl: URL) async {
         do {
-            frameFlowUploadPostFeedbackCenter.ziveGlobalFeedbackShowLoading(showsMask: true)
-            guard let frameFlowUploadPostVideoData = try await frameFlowUploadPostSelectedVideoItem
-                .loadTransferable(type: Data.self) else {
-                frameFlowUploadPostFeedbackCenter.ziveGlobalFeedbackHideLoading()
-                await MainActor.run {
-                    frameFlowUploadPostFeedbackCenter.ziveGlobalFeedbackShowToast(
-                        text: "Failed to load video",
-                        status: .error
-                    )
-                }
-                return
+            await MainActor.run {
+                frameFlowUploadPostFeedbackCenter.ziveGlobalFeedbackShowLoading(showsMask: true)
             }
 
+            let frameFlowUploadPostVideoData = try Data(contentsOf: frameFlowUploadPostSelectedVideoUrl)
             let frameFlowUploadPostVideoUrl = try frameFlowUploadPostSaveVideoToLocal(
                 frameFlowUploadPostVideoData,
-                preferredExtension: frameFlowUploadPostSelectedVideoItem
-                    .supportedContentTypes
-                    .first?
-                    .preferredFilenameExtension ?? "mp4"
+                preferredExtension: frameFlowUploadPostSelectedVideoUrl.pathExtension.isEmpty
+                ? "mp4"
+                : frameFlowUploadPostSelectedVideoUrl.pathExtension
             )
             let frameFlowUploadPostCoverUrl = try frameFlowUploadPostGenerateCoverImage(
                 for: frameFlowUploadPostVideoUrl
@@ -269,10 +259,13 @@ struct FrameFlowUploadPost: View {
                 frameFlowUploadPostVideoLocalUrlString = frameFlowUploadPostVideoUrl.path
                 frameFlowUploadPostCoverLocalUrlString = frameFlowUploadPostCoverUrl.path
             }
-            frameFlowUploadPostFeedbackCenter.ziveGlobalFeedbackHideLoading()
+            await MainActor.run {
+                frameFlowUploadPostFeedbackCenter.ziveGlobalFeedbackHideLoading()
+            }
         } catch {
             await MainActor.run {
                 frameFlowUploadPostIsUploading = false
+                frameFlowUploadPostFeedbackCenter.ziveGlobalFeedbackHideLoading()
                 frameFlowUploadPostFeedbackCenter.ziveGlobalFeedbackShowToast(
                     text: "Failed to process video",
                     status: .error
@@ -316,11 +309,5 @@ struct FrameFlowUploadPost: View {
 
     private func frameFlowUploadPostDocumentsDirectory() -> URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    }
-}
-
-#Preview {
-    NavigationStack {
-        FrameFlowUploadPost()
     }
 }

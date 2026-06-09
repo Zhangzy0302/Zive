@@ -130,6 +130,11 @@ final class CacoaPulseWalletIAPManager: NSObject, ObservableObject {
         productKeyId: String,
         completion: @escaping (CacoaPulseWalletPurchaseResult) -> Void
     ) {
+        guard !cacoaPulseWalletIsPurchasing else {
+            completion(.pending)
+            return
+        }
+
         guard SKPaymentQueue.canMakePayments() else {
             completion(.failed(message: "Payments not allowed"))
             return
@@ -160,6 +165,74 @@ final class CacoaPulseWalletIAPManager: NSObject, ObservableObject {
             self.cacoaPulseWalletIsPurchasing = false
             self.cacoaPulseWalletPurchaseCompletion?(cacoaPulseWalletResult)
             self.cacoaPulseWalletPurchaseCompletion = nil
+        }
+    }
+
+    private func cacoaPulseWalletReceiptDataString() -> String {
+        guard let cacoaPulseWalletReceiptURL = Bundle.main.appStoreReceiptURL,
+              let cacoaPulseWalletReceiptData = try? Data(contentsOf: cacoaPulseWalletReceiptURL) else {
+            return ""
+        }
+
+        return cacoaPulseWalletReceiptData.base64EncodedString()
+    }
+
+    private func cacoaPulseWalletHandlePurchasedTransaction(
+        _ cacoaPulseWalletTransaction: SKPaymentTransaction
+    ) {
+        guard let cacoaPulseWalletProduct = cacoaPulseWalletProductConfig(
+            productId: cacoaPulseWalletTransaction.payment.productIdentifier
+        ) else {
+            SKPaymentQueue.default().finishTransaction(cacoaPulseWalletTransaction)
+            cacoaPulseWalletFinishPurchase(.failed(message: "Product not found"))
+            return
+        }
+
+        guard RhythmVaultAppStorage.rhythmVaultIsB else {
+            SKPaymentQueue.default().finishTransaction(cacoaPulseWalletTransaction)
+            StepSyncAdjustManager.shared.stepSyncTrackPurchase(
+                dollar: cacoaPulseWalletProduct.cacoaPulseWalletPrice
+            )
+            cacoaPulseWalletFinishPurchase(
+                .success(coins: cacoaPulseWalletProduct.cacoaPulseWalletCoinCount)
+            )
+            return
+        }
+
+        let cacoaPulseWalletPurchaseID = cacoaPulseWalletTransaction.transactionIdentifier ?? ""
+        let cacoaPulseWalletVerificationData = cacoaPulseWalletReceiptDataString()
+        let cacoaPulseWalletOrderCode = rhythmVaultUsersOrderCode
+
+        Task {
+            do {
+                let cacoaPulseWalletDidVerify = try await BeatBridgeApiCall().beatBridgePayCall(
+                    purchaseID: cacoaPulseWalletPurchaseID,
+                    serverVerificationData: cacoaPulseWalletVerificationData,
+                    orderCode: cacoaPulseWalletOrderCode
+                )
+
+                await MainActor.run {
+                    SKPaymentQueue.default().finishTransaction(cacoaPulseWalletTransaction)
+
+                    if cacoaPulseWalletDidVerify {
+                        StepSyncAdjustManager.shared.stepSyncTrackPurchase(
+                            dollar: cacoaPulseWalletProduct.cacoaPulseWalletPrice
+                        )
+                        cacoaPulseWalletFinishPurchase(
+                            .success(coins: cacoaPulseWalletProduct.cacoaPulseWalletCoinCount)
+                        )
+                    } else {
+                        cacoaPulseWalletFinishPurchase(.failed(message: "Purchase unverified"))
+                    }
+                }
+            } catch {
+                await MainActor.run {
+                    SKPaymentQueue.default().finishTransaction(cacoaPulseWalletTransaction)
+                    cacoaPulseWalletFinishPurchase(
+                        .failed(message: error.localizedDescription)
+                    )
+                }
+            }
         }
     }
 }
@@ -207,18 +280,7 @@ extension CacoaPulseWalletIAPManager: SKPaymentTransactionObserver {
         for cacoaPulseWalletTransaction in transactions {
             switch cacoaPulseWalletTransaction.transactionState {
             case .purchased:
-                SKPaymentQueue.default().finishTransaction(cacoaPulseWalletTransaction)
-
-                guard let cacoaPulseWalletProduct = cacoaPulseWalletProductConfig(
-                    productId: cacoaPulseWalletTransaction.payment.productIdentifier
-                ) else {
-                    cacoaPulseWalletFinishPurchase(.failed(message: "Product not found"))
-                    continue
-                }
-
-                cacoaPulseWalletFinishPurchase(
-                    .success(coins: cacoaPulseWalletProduct.cacoaPulseWalletCoinCount)
-                )
+                cacoaPulseWalletHandlePurchasedTransaction(cacoaPulseWalletTransaction)
 
             case .failed:
                 SKPaymentQueue.default().finishTransaction(cacoaPulseWalletTransaction)
@@ -245,6 +307,9 @@ extension CacoaPulseWalletIAPManager: SKPaymentTransactionObserver {
 
             case .deferred:
                 cacoaPulseWalletPurchaseCompletion?(.pending)
+                DispatchQueue.main.async {
+                    self.cacoaPulseWalletIsPurchasing = false
+                }
 
             @unknown default:
                 break
@@ -413,11 +478,5 @@ struct CocoaPulseWallet: View {
                 cacoaPulseWalletIAPManager.cacoaPulseWalletFetchProducts()
             }
         }
-    }
-}
-
-#Preview {
-    NavigationStack {
-        CocoaPulseWallet()
     }
 }

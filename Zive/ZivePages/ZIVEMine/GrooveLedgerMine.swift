@@ -132,7 +132,6 @@ struct GrooveLedgerMine: View {
             Text(value)
                 .font(ZiveStyle.FontBook.boldItalic(20))
                 .foregroundStyle(Color.white)
-                .italic()
 
             Text(title)
                 .font(ZiveStyle.FontBook.regular(14))
@@ -158,7 +157,6 @@ struct GrooveLedgerMine: View {
                     Text("\(grooveLedgerMineCurrentUser?.orbitUserCoinCount ?? 0)")
                         .font(ZiveStyle.FontBook.boldItalic(36))
                         .foregroundStyle(ZiveStyle.ColorPalette.textPrimary)
-                        .italic()
                     
                     Text("Wallet")
                         .font(ZiveStyle.FontBook.regular(14))
@@ -181,7 +179,6 @@ struct GrooveLedgerMine: View {
             Text("Post")
                 .font(ZiveStyle.FontBook.boldItalic(20))
                 .foregroundStyle(Color.white)
-                .italic()
             
             LazyVStack(spacing: 16) {
                 ForEach(grooveLedgerMinePostVideos) { grooveLedgerMineVideo in

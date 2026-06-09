@@ -381,9 +381,3 @@ struct SkillProgressionSign: View {
         }
     }
 }
-
-#Preview {
-    NavigationStack {
-        SkillProgressionSign(skillProgressionSignInitialMode: .signIn)
-    }
-}

@@ -1,5 +1,4 @@
 import SwiftUI
-import PhotosUI
 import AVFoundation
 
 enum WhisperBeatChatRoomInputMode {
@@ -15,7 +14,7 @@ struct WhisperBeatChatRoom: View {
     let whisperBeatChatRoomId: String
     @State private var whisperBeatChatRoomInputMode: WhisperBeatChatRoomInputMode = .text
     @State private var whisperBeatChatRoomMessage = ""
-    @State private var whisperBeatChatRoomSelectedImageItem: PhotosPickerItem?
+    @State private var whisperBeatChatRoomShowsImagePicker = false
     @State private var whisperBeatChatRoomAudioRecorder: AVAudioRecorder?
     @State private var whisperBeatChatRoomAudioPlayer: AVAudioPlayer?
     @State private var whisperBeatChatRoomRecordingUrl: URL?
@@ -59,10 +58,14 @@ struct WhisperBeatChatRoom: View {
         .onChange(of: whisperBeatChatRoomMessagesList.count) { _ in
             whisperBeatChatRoomMarkCurrentRoomAsRead()
         }
-        .onChange(of: whisperBeatChatRoomSelectedImageItem) { _ in
-            Task {
-                await whisperBeatChatRoomLoadSelectedImage()
-            }
+        .sheet(isPresented: $whisperBeatChatRoomShowsImagePicker) {
+            ZiveLegacyMediaPicker(
+                ziveLegacyMediaPickerKind: .image,
+                ziveLegacyMediaPickerOnImageData: { whisperBeatChatRoomImageData in
+                    whisperBeatChatRoomLoadSelectedImage(whisperBeatChatRoomImageData)
+                },
+                ziveLegacyMediaPickerOnVideoUrl: nil
+            )
         }
         .onChange(of: whisperBeatChatRoomFocusField) { whisperBeatChatRoomFocusedField in
             if whisperBeatChatRoomFocusedField == .message {
@@ -135,11 +138,11 @@ struct WhisperBeatChatRoom: View {
                     }
                 }
 
-                PhotosPicker(
-                    selection: $whisperBeatChatRoomSelectedImageItem,
-                    matching: .images,
-                    photoLibrary: .shared()
-                ) {
+                Button {
+                    whisperBeatChatRoomGuestGate.CBnxweZGoLogRequireLogin {
+                        whisperBeatChatRoomShowsImagePicker = true
+                    }
+                } label: {
                     whisperBeatChatRoomToolButtonLabel(imageName: "ZIVESendIMage")
                 }
                 .buttonStyle(.plain)
@@ -471,57 +474,30 @@ struct WhisperBeatChatRoom: View {
         )
     }
 
-    private func whisperBeatChatRoomLoadSelectedImage() async {
-        guard let whisperBeatChatRoomImageItem = whisperBeatChatRoomSelectedImageItem else {
-            return
-        }
-
+    private func whisperBeatChatRoomLoadSelectedImage(_ whisperBeatChatRoomImageData: Data) {
         guard !QeixbgBriwyState.qeixbgBriwyIsGuestUser() else {
-            await MainActor.run {
-                whisperBeatChatRoomSelectedImageItem = nil
-                whisperBeatChatRoomGuestGate.CBnxweZGoLogPresent()
-            }
+            whisperBeatChatRoomGuestGate.CBnxweZGoLogPresent()
             return
         }
 
         do {
-            guard let whisperBeatChatRoomImageData = try await whisperBeatChatRoomImageItem
-                .loadTransferable(type: Data.self) else {
-                await MainActor.run {
-                    whisperBeatChatRoomFeedbackCenter.ziveGlobalFeedbackShowToast(
-                        text: "Failed to load image",
-                        status: .error
-                    )
-                }
-                return
-            }
-
             let whisperBeatChatRoomImageUrl = try whisperBeatChatRoomSaveMediaData(
                 whisperBeatChatRoomImageData,
                 prefix: "whisperBeatImage",
-                preferredExtension: whisperBeatChatRoomImageItem
-                    .supportedContentTypes
-                    .first?
-                    .preferredFilenameExtension ?? "jpg"
+                preferredExtension: "jpg"
             )
 
-            await MainActor.run {
-                whisperBeatChatRoomCreateMediaMessage(
-                    imagePath: whisperBeatChatRoomImageUrl.path,
-                    voicePath: "",
-                    voiceDuration: 0,
-                    lastMessageText: "[Image]"
-                )
-                whisperBeatChatRoomSelectedImageItem = nil
-            }
+            whisperBeatChatRoomCreateMediaMessage(
+                imagePath: whisperBeatChatRoomImageUrl.path,
+                voicePath: "",
+                voiceDuration: 0,
+                lastMessageText: "[Image]"
+            )
         } catch {
-            await MainActor.run {
-                whisperBeatChatRoomFeedbackCenter.ziveGlobalFeedbackShowToast(
-                    text: "Failed to send image",
-                    status: .error
-                )
-                whisperBeatChatRoomSelectedImageItem = nil
-            }
+            whisperBeatChatRoomFeedbackCenter.ziveGlobalFeedbackShowToast(
+                text: "Failed to send image",
+                status: .error
+            )
         }
     }
 
@@ -743,11 +719,5 @@ struct WhisperBeatChatRoom: View {
         ) {
             whisperBeatChatRoomNavigator.weioZwivbePopToRoot()
         }
-    }
-}
-
-#Preview {
-    NavigationStack {
-        WhisperBeatChatRoom(whisperBeatChatRoomId: "room_001")
     }
 }

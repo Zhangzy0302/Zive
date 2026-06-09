@@ -233,6 +233,28 @@ struct ZiveSecureField<Field: Hashable>: View {
 }
 
 extension View {
+    func ziveLegacyUnderline(color: Color = ZiveStyle.ColorPalette.white.opacity(0.86)) -> some View {
+        overlay(alignment: .bottom) {
+            Rectangle()
+                .fill(color)
+                .frame(height: 0.7)
+                .offset(y: 1)
+        }
+    }
+
+    @ViewBuilder
+    func ziveHideTextEditorBackground() -> some View {
+        if #available(iOS 16.0, *) {
+            scrollContentBackground(.hidden)
+        } else {
+            onAppear {
+                UITextView.appearance().backgroundColor = .clear
+            }
+        }
+    }
+}
+
+extension View {
     func ziveTitleFont(_ size: CGFloat) -> some View {
         font(ZiveStyle.FontBook.bold(size))
     }

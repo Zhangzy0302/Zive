@@ -99,7 +99,7 @@ struct TraceGlowActionSheet: View {
                 }
             )
             .clipShape(
-                UnevenRoundedRectangle(topLeadingRadius: 20, topTrailingRadius: 20)
+                ZiveTopRoundedCornerShape(ziveTopRoundedCornerRadius: 20)
             )
             
             .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -197,11 +197,4 @@ struct TraceGlowActionSheet: View {
     private var traceGlowActionSheetCurrentUser: OrbitUserModel? {
         traceGlowActionSheetUserStore.orbitUserFetch(by: traceGlowActionSheetCurrentUserId)
     }
-}
-
-#Preview {
-    TraceGlowActionSheet(
-        traceGlowActionSheetIsPresented: .constant(true),
-        traceGlowActionSheetTargetUserId: "user_001"
-    )
 }

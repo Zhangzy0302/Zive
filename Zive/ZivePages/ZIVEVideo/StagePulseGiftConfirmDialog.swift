@@ -227,16 +227,3 @@ struct StagePulseGiftConfirmDialog: View {
         }
     }
 }
-
-#Preview {
-    StagePulseGiftConfirmDialog(
-        stagePulseGiftConfirmVideoId: "video_001",
-        stagePulseGiftConfirmGift: StagePulseGiftOption(
-            stagePulseGiftOptionImageName: "ZIVEXIAGift_2",
-            stagePulseGiftOptionValue: 2,
-            stagePulseGiftOptionPurchaseCoins: 100
-        ),
-        stagePulseGiftConfirmIsPresented: .constant(true),
-        stagePulseGiftConfirmOnCloseSheet: {}
-    )
-}

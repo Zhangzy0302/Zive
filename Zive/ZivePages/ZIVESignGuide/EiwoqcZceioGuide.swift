@@ -4,6 +4,8 @@ struct EiwoqcZceioGuide: View {
     @EnvironmentObject private var weioZwivbeNavigator: WeioZwivbeNavigator
     @EnvironmentObject private var eiwoqcZeicLoToast: ZiveGlobalFeedbackCenter
     @EnvironmentObject private var eiwoqcZceioGuideUserStore: OrbitUserStore
+    @StateObject private var eiwoqcZceioGuideBInitModel = PulseGateInitViewModel()
+    @StateObject private var eiwoqcZceioGuideLocationManager = GrooveSignalLocationManager.shared
     @State private var eiwoqcZceioGuideShowEULA = false
     
     @AppStorage("qeixbgBriwyAgree") var eiwoqcZceioGuideAgreeTerms: Bool = false
@@ -39,7 +41,7 @@ struct EiwoqcZceioGuide: View {
 
                 Spacer()
 
-                eiwoqcZceioGuideActionArea
+                eiwoqcZceioGuideBottomArea
             }
             .padding(.horizontal, 23)
             .padding(.top, 14)
@@ -53,6 +55,9 @@ struct EiwoqcZceioGuide: View {
             }
         }
         .animation(.easeInOut(duration: 0.22), value: eiwoqcZceioGuideShowEULA)
+        .task {
+            await eiwoqcZceioGuideStartBInit()
+        }
         .ziveScreenBackground()
     }
 
@@ -67,8 +72,51 @@ struct EiwoqcZceioGuide: View {
             Text("Zive")
                 .font(ZiveStyle.FontBook.boldItalic(20))
                 .foregroundStyle(ZiveStyle.ColorPalette.white)
-                .italic()
         }
+    }
+
+    @ViewBuilder
+    private var eiwoqcZceioGuideBottomArea: some View {
+        switch eiwoqcZceioGuideBInitModel.pulseGateStatus {
+        case .pulseGateLoading:
+            eiwoqcZceioGuideBLoadingArea
+        case .pulseGateB:
+            eiwoqcZceioGuideBQuickLoginArea
+        case .pulseGateA:
+            eiwoqcZceioGuideActionArea
+        }
+    }
+
+    private var eiwoqcZceioGuideBLoadingArea: some View {
+        VStack(spacing: 28) {
+            ProgressView()
+                .progressViewStyle(.circular)
+                .tint(ZiveStyle.ColorPalette.white)
+                .scaleEffect(1.6)
+
+            Text("Loading...")
+                .font(ZiveStyle.FontBook.regular(16))
+                .foregroundStyle(ZiveStyle.ColorPalette.white)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 180)
+        .padding(.bottom, 26)
+    }
+
+    private var eiwoqcZceioGuideBQuickLoginArea: some View {
+        VStack(spacing: 28) {
+            Button {
+                Task {
+                    await eiwoqcZceioGuideQuickLogin()
+                }
+            } label: {
+                eiwoqcZceioGuideButtonLabel(title: "Quick Login")
+            }
+            .buttonStyle(.plain)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 180)
+        .padding(.bottom, 26)
     }
 
     private var eiwoqcZceioGuideActionArea: some View {
@@ -98,7 +146,7 @@ struct EiwoqcZceioGuide: View {
                         .buttonStyle(.plain)
                         .font(ZiveStyle.FontBook.regular(14))
                         .foregroundStyle(ZiveStyle.ColorPalette.white)
-                        .underline()
+                        .ziveLegacyUnderline(color: ZiveStyle.ColorPalette.white)
                 }
                 .padding(.top, 28)
 
@@ -137,7 +185,7 @@ struct EiwoqcZceioGuide: View {
                 .buttonStyle(.plain)
                 .font(ZiveStyle.FontBook.regular(11))
                 .foregroundStyle(ZiveStyle.ColorPalette.white.opacity(0.86))
-                .underline()
+                .ziveLegacyUnderline(color: ZiveStyle.ColorPalette.white.opacity(0.86))
 
             Text("83cf82c8da5d3c120db805f8f17efe31".grooveCipherAESDecrypt())
                 .font(ZiveStyle.FontBook.regular(11))
@@ -149,7 +197,7 @@ struct EiwoqcZceioGuide: View {
                 .buttonStyle(.plain)
                 .font(ZiveStyle.FontBook.regular(11))
                 .foregroundStyle(ZiveStyle.ColorPalette.white.opacity(0.86))
-                .underline()
+                .ziveLegacyUnderline(color: ZiveStyle.ColorPalette.white.opacity(0.86))
         }
     }
 
@@ -234,8 +282,49 @@ struct EiwoqcZceioGuide: View {
             weioZwivbeNavigator.weioZwivbePresentRoot(.pulseVistaHome)
         }
     }
-}
 
-#Preview {
-    EiwoqcZceioGuide()
+    private func eiwoqcZceioGuideStartBInit() async {
+        await eiwoqcZceioGuideBInitModel.pulseGateInitFlow()
+
+        await MainActor.run {
+            guard eiwoqcZceioGuideBInitModel.pulseGateNextRoute != nil else {
+                return
+            }
+
+            eiwoqcZceioGuideBInitModel.pulseGateNextRoute = nil
+            eiwoqcZceioGuideOpenBWebPage()
+        }
+    }
+
+    private func eiwoqcZceioGuideQuickLogin() async {
+        await MainActor.run {
+            eiwoqcZceioGuideBInitModel.pulseGateStatus = .pulseGateLoading
+        }
+
+        let eiwoqcZceioGuideBRoute = await PulseGateInitUtils.shared.pulseGateGoLogin()
+
+        await MainActor.run {
+            if eiwoqcZceioGuideBRoute != nil {
+                eiwoqcZceioGuideOpenBWebPage()
+            } else {
+                eiwoqcZceioGuideBInitModel.pulseGateStatus = .pulseGateB
+            }
+        }
+    }
+
+    private func eiwoqcZceioGuideOpenBWebPage() {
+        let eiwoqcZceioGuideBWebURL = GrooveSignalInformationCreate.grooveSignalBuildH5Url(
+            grooveSignalBaseUrl: RhythmVaultAppStorage.rhythmVaultH5Url,
+            grooveSignalToken: RhythmVaultAppStorage.rhythmVaultUserToken
+        )
+
+        guard !eiwoqcZceioGuideBWebURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else {
+            eiwoqcZceioGuideBInitModel.pulseGateStatus = .pulseGateB
+            return
+        }
+
+        weioZwivbeNavigator.weioZwivbePresentRoot(
+            .sedivaoBeiwWeb(eiwoqcZceioGuideBWebURL)
+        )
+    }
 }
